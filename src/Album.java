@@ -31,8 +31,6 @@ public class Album implements java.io.Serializable {
 	@JoinColumn(name="album_id")
 	private Set<Photo> photos = new HashSet<Photo>();
 
-
-
 	public void addPhoto(Photo newPhoto) {
 		photos.add(newPhoto);
 	}

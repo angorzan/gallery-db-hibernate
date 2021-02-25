@@ -13,9 +13,11 @@ public class Main {
 		Main main = new Main();
 //		main.addNewData();
 //		main.printUsers();
-//		main.cascadeDeleteLikeWithPhotoAndUser();
-//		main.cascadeDeleteLike();
-		main.removePhotoFromAlbum();
+		main.cascadeTest();
+//		main.removeUser();
+//		main.removeAlbum();
+//		main.removePhoto();
+		main.removeLike();
 		main.close();
 	}
 
@@ -86,9 +88,58 @@ public class Main {
 		}
 	}
 	
-	private void cascadeDeleteLikeWithPhotoAndUser() {
+	private void removeUser() {
 		
-		String hql = "FROM User u WHERE u.id=5";
+		String hql = "FROM User WHERE id=2";
+		Query query = session.createQuery(hql);
+		User user = (User) query.uniqueResult();
+		Transaction transaction = session.beginTransaction();
+		session.delete(user);
+		transaction.commit();
+	}
+	
+	private void removeAlbum() {
+		
+		String hql = "FROM User WHERE id=4";
+		Query query = session.createQuery(hql);
+		User user = (User) query.uniqueResult();
+				
+		Transaction transaction = session.beginTransaction();
+		for(Album album : user.getAlbums()) {
+			user.removeAlbum(album);
+			session.save(user);
+		}
+		transaction.commit();
+	}
+	private void removePhoto() {
+		
+		String hql = "FROM Album WHERE id=9";
+		Query query = session.createQuery(hql);
+		Album album = (Album) query.uniqueResult();
+				
+		Transaction transaction = session.beginTransaction();
+		for(Photo photo : album.getPhotos()) {
+			album.removePhoto(photo);
+			session.save(album);
+		}
+		transaction.commit();
+	}
+	private void removeLike() {
+		
+		String hql = "FROM Photo WHERE id=4";
+		Query query = session.createQuery(hql);
+		Photo photo = (Photo) query.uniqueResult();
+				
+		Transaction transaction = session.beginTransaction();
+		for(User user : photo.getLikedByUsers()) {
+			photo.removeUserLike(user);
+			session.save(photo);
+		}
+		transaction.commit();
+	}
+	private void cascadeTest() {
+		
+		String hql = "FROM User u WHERE u.id=2";
 		Query query = session.createQuery(hql);
 		User user = (User) query.uniqueResult();
 				
@@ -100,29 +151,5 @@ public class Main {
 		session.delete(user);
 		transaction.commit();
 	}
-	private void cascadeDeleteLike() {
-		
-		String hql = "FROM User u WHERE u.id=5";
-		Query query = session.createQuery(hql);
-		User user = (User) query.uniqueResult();
-				
-		Transaction transaction = session.beginTransaction();
-		for(Photo photo : user.getLikedPhotos()) {
-			session.save(photo);
-		}
-		transaction.commit();
-	}
-	private void removePhotoFromAlbum() {
-		
-		String hql = "FROM Album a WHERE a.id=7";
-		Query query = session.createQuery(hql);
-		Album album = (Album) query.uniqueResult();
-				
-		Transaction transaction = session.beginTransaction();
-		for(Photo photo : album.getPhotos()) {
-			album.removePhoto(photo);
-			session.save(album);
-		}
-		transaction.commit();
-	}
+
 }
